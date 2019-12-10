@@ -1,0 +1,56 @@
+<div>
+  <br><br>
+  {{#each question}}
+  <div>
+    <h5 class="display-5 question-title"> {{ q }} </h2> <br>
+      <select class="custom-select custom-select-lg mb-3">
+        <option selected>Choose!</option>
+        {{#each answers }}
+        <option value={{cat}}> {{ ans }} </option>
+        {{/each}}
+      </select>
+      {{/each}}
+  </div>
+  <button type="button" id="send" class="btn btn-primary">Send!</button>
+</div>
+
+<script>
+  const name = prompt('What is your name?');
+
+  function findCommon(arr) {
+    var max = 1,
+      m = [],
+      val = arr[0],
+      i, x;
+
+    for (i = 0; i < arr.length; i++) {
+      x = arr[i]
+      if (m[x]) {
+        ++m[x] > max && (max = m[i], val = x);
+      } else {
+        m[x] = 1;
+      }
+    } return val;
+  }
+
+  let targets = [];
+  $('#send').on('click', () => {
+    targets = [];
+    $.each($(".custom-select option:selected"), function () {
+      targets.push($(this).val());
+    });
+    $.ajax({
+      type: "POST",
+      url: "http://localhost:3000/api/addfriend",
+      data: {
+        "name": name,
+        "type": findCommon(targets)
+      }
+    });
+    fetch(`http://localhost:3000/api/findfriend/${findCommon(targets)}`).then(bff => {
+      bff.json().then(data => {
+        alert(`Your new bff is ${data[0].name}`);
+      })
+    });
+  });
+</script>
